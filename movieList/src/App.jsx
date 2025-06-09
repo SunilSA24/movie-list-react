@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import './App.css'
 import Home from './Components/Home'
 import WatchList from './Components/WatchList'
+import NavBar from './Components/NavBar'
 
 function App() {
 
