@@ -10,12 +10,12 @@ function Movies() {
   const [watchList, setWatchList] = useState([]);
 
   const handleNext = () => {
-    setPageNo(pageNo+1);
-  }; 
+    setPageNo(pageNo + 1);
+  };
 
   const handlePrev = () => {
-    if(pageNo > 1) {
-      setPageNo(pageNo-1);
+    if (pageNo > 1) {
+      setPageNo(pageNo - 1);
     }
   };
 
@@ -39,7 +39,17 @@ function Movies() {
         console.log('Movies', res);
         setMovies(res.data.results);
       });
-  }, [pageNo])
+  }, [pageNo]);
+
+  useEffect(() => {
+    let moviesFromLocalStorage = localStorage.getItem('movies')
+    if (!moviesFromLocalStorage) {
+      return
+    }
+
+    setWatchList(JSON.parse(moviesFromLocalStorage));
+  }, []);
+
   return (
     <div className="min-h-screen">
       <div className="text-4xl font-bold text-center m-5">Trending Movies</div>
