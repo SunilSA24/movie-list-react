@@ -1,54 +1,54 @@
-import { useEffect, useState } from "react";
-import axios from 'axios';
+import { useContext, useEffect } from "react";
+
 import MovieCard from './MovieCard';
 import Pagination from "./Pagination";
+import { MovieContext } from "./MovieContext";
+import { useDispatch, useSelector } from "react-redux";
+import PaginationSlice from "../Redux/paginationSlice";
+import fetchMovieMiddleware from "../Redux/movieMiddleware";
+
+const paginationActions = PaginationSlice.actions;
 
 function Movies() {
 
-  const [movies, setMovies] = useState([]);
-  const [pageNo, setPageNo] = useState(1);
-  const [watchList, setWatchList] = useState([]);
+  const { movies, error, loading } = useSelector((state) => state.MovieSlice)
+  const { watchList, addToWatchList, removeFromWatchList } = useContext(MovieContext);
+
+  const { pageNo } = useSelector((state) => state.PaginationSlice);
+
+  const dispatch = useDispatch();
 
   const handleNext = () => {
-    setPageNo(pageNo + 1);
+    dispatch(paginationActions.handleNext());
   };
 
   const handlePrev = () => {
-    if (pageNo > 1) {
-      setPageNo(pageNo - 1);
-    }
+    dispatch(paginationActions.handlePrevious());
   };
 
-  const addToWatchList = (movieObj) => {
-    const updateWatchList = [...watchList, movieObj];
-    setWatchList(updateWatchList);
-    localStorage.setItem('movies', JSON.stringify(updateWatchList));
-  }
-
-  const removeFromWatchList = (movieObj) => {
-    const filterWatchList = watchList.filter((movie) => {
-      return movie.id !== movieObj.id;
-    });
-    localStorage.setItem('movies', JSON.stringify(filterWatchList));
-
-  }
-
   useEffect(() => {
-    axios.get(`https://api.themoviedb.org/3/trending/movie/day?api_key=3aec63790d50f3b9fc2efb4c15a8cf99&language=en-US&page=${pageNo}`)
-      .then((res) => {
-        console.log('Movies', res);
-        setMovies(res.data.results);
-      });
+    dispatch(fetchMovieMiddleware(pageNo));
   }, [pageNo]);
 
-  useEffect(() => {
-    let moviesFromLocalStorage = localStorage.getItem('movies')
-    if (!moviesFromLocalStorage) {
-      return
-    }
+  if (loading) {
+    return (
+      <div>
+        <div className="text-4xl font-bold text-center m-5">Loading...</div>
+      </div>
+    )
+  }
 
-    setWatchList(JSON.parse(moviesFromLocalStorage));
-  }, []);
+  if (error) {
+    return (
+      <div>
+        <div className="text-4xl font-bold text-center m-5">
+          Something went wrong!
+        </div>
+      </div>
+    )
+  }
+
+
 
   return (
     <div className="min-h-screen">
