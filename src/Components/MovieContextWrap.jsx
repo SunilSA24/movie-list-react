@@ -15,6 +15,7 @@ export default function MovieContextWrap({ children }) {
         const filterWatchList = watchList.filter((movie) => {
             return movie.id !== movieObj.id;
         });
+        setWatchList(filterWatchList);
         localStorage.setItem('movies', JSON.stringify(filterWatchList));
 
     }
